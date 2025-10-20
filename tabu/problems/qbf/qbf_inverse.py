@@ -1,4 +1,4 @@
-from src.problems.qbf.qbf import QBF
+from tabu.problems.qbf.qbf import QBF
 
 class QBF_Inverse(QBF):
     def evaluate_qbf(self):

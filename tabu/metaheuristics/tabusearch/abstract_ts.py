@@ -1,8 +1,8 @@
 import abc
 import random
 from collections import deque
-from src.solutions.solution import Solution
-from src.problems.evaluator import Evaluator
+from tabu.solutions.solution import Solution
+from tabu.problems.evaluator import Evaluator
 
 class AbstractTS(abc.ABC):
     def __init__(self, obj_function: Evaluator, tenure: int, iterations: int):

@@ -1,5 +1,5 @@
 import abc
-from src.solutions.solution import Solution
+from tabu.solutions.solution import Solution
 
 class Evaluator(abc.ABC):
     @abc.abstractmethod

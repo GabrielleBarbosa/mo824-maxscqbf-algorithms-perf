@@ -1,4 +1,4 @@
-from src.problems.sc_qbf.sc_qbf import SC_QBF
+from tabu.problems.sc_qbf.sc_qbf import SC_QBF
 
 class SC_QBF_Inverse(SC_QBF):
     def evaluate_qbf(self):

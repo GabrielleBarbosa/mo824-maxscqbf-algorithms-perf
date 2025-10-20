@@ -1,9 +1,9 @@
 import random
 import time
 from collections import deque
-from src.metaheuristics.tabusearch.abstract_ts import AbstractTS
-from src.problems.sc_qbf.sc_qbf_inverse import SC_QBF_Inverse
-from src.solutions.solution import Solution
+from tabu.metaheuristics.tabusearch.abstract_ts import AbstractTS
+from tabu.problems.sc_qbf.sc_qbf_inverse import SC_QBF_Inverse
+from tabu.solutions.solution import Solution
 
 class TS_SC_QBF(AbstractTS):
     def __init__(self, tenure: int, iterations: int, timeout: int, filename: str, search_method: str, strategy: str, random_seed = 42, target_value = None):
@@ -130,10 +130,11 @@ class TS_SC_QBF(AbstractTS):
         self.constructive_heuristic()
         self.tl = self.make_tl()
 
-        time_limit = time.time() + self.timeout 
+        start_time = time.time()
+        time_limit = start_time + self.timeout 
 
         for i in range(self.iterations):
-            self.current_iter = i
+            self.current_iter = i + 1
             if time.time() >= time_limit:
                 if self.verbose:
                     print(f"(Iter. {i}) Time limit reached. Stopping early.")
@@ -143,6 +144,8 @@ class TS_SC_QBF(AbstractTS):
             if self.best_sol.cost > self.sol.cost:
                 if self.obj_function.is_feasible(self.sol):
                     self.best_sol = Solution(self.sol)
+                    self.best_sol_time = time.time() - start_time
+                    self.best_sol_iter = i + 1
                     if self.verbose:
                         print(f"(Iter. {i}) BestSol = {self.best_sol}")
                     if self.target_value != None and self.best_sol.cost <= self.target_value:

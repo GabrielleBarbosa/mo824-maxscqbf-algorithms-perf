@@ -1,6 +1,6 @@
 import numpy as np
-from src.problems.evaluator import Evaluator
-from src.solutions.solution import Solution
+from tabu.problems.evaluator import Evaluator
+from tabu.solutions.solution import Solution
 
 class QBF(Evaluator):
     def __init__(self, filename: str):
