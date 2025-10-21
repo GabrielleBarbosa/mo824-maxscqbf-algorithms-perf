@@ -2,7 +2,6 @@ import time
 import csv
 from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
 
-
 def main():    
     output_file = "results/tabu_pp.csv"
     with open(output_file, "w", newline="") as f:

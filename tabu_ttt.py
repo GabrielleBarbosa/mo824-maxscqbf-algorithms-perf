@@ -1,10 +1,11 @@
 import time
 import csv
+import multiprocessing
+import os
 from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
 
-
-def main():    
-    output_file = "results/tabu_ttt.csv"
+def worker(instance_name, target, config_name, tenure, local_search, strategy, process_index):
+    output_file = f"results/tabu_ttt_{process_index}.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -19,57 +20,72 @@ def main():
         ])
 
     parent_dir = "instances/sc_qbf"
-    instances = {
-        "scqbf_100_1" : 400,
-        "scqbf_200_1" : 400,
-        "scqbf_400_1": 400,
-    }
     
-    print("Running computational experiments...")
-    print("=" * 60)
+    for r in range(50):
+        start_time = time.time()
+        
+        ts = TS_SC_QBF(
+            tenure=tenure, 
+            iterations=10000, 
+            filename=f"{parent_dir}/{instance_name}.txt",
+            strategy=strategy,
+            search_method=local_search,
+            timeout=10*60, 
+            random_seed=r, 
+            target_value=-target,
+            verbose=False
+        )
+        
+        best_sol = ts.solve()
+        end_time = time.time()
+
+        with open(output_file, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([
+                instance_name,
+                config_name,
+                r,
+                ts.current_iter,
+                end_time - start_time,
+                -best_sol.cost,
+                ts.best_sol_time,
+                ts.best_sol_iter,
+            ])
+
+def main():
+    if not os.path.exists("results"):
+        os.makedirs("results")
+
+    parent_dir = "instances/sc_qbf"
+    instances = [
+        ("scqbf_100_1", 400),
+        ("scqbf_200_1", 400),
+        ("scqbf_400_1", 400),
+        ("scqbf_100_1", 400),
+        ("scqbf_200_1", 400),
+        ("scqbf_400_1", 400),
+    ]
     
     configs = [
         ("BEST_PROBABILISTIC", 0.2, "best_improving", "probabilistic"),
     ]
     
-    for r in range(50):
-        for i, target in instances.items():
-            print("\n" + "-" * 60)
-            print(f"Instance: {i}, target {target}, seed {r}")
-            print("-" * 60)
-            for config_name, tenure, local_search, strategy in configs:
-                print(f"\nRunning {config_name}...")
-                start_time = time.time()
-                
-                ts = TS_SC_QBF(
-                    tenure=tenure, 
-                    iterations=10000, 
-                    filename=f"{parent_dir}/{i}.txt",
-                    strategy=strategy,
-                    search_method=local_search,
-                    timeout=30*60, 
-                    random_seed=r, 
-                    target_value=-target,
-                )
-                
-                best_sol = ts.solve()
-                end_time = time.time()
+    processes = []
+    process_index = 0
+    for i, target in instances:
+        for config_name, tenure, local_search, strategy in configs:
+            process = multiprocessing.Process(
+                target=worker,
+                args=(i, target, config_name, tenure, local_search, strategy, process_index)
+            )
+            processes.append(process)
+            process.start()
+            process_index += 1
 
-                with open(output_file, "a", newline="") as f:
-                    writer = csv.writer(f)
-                    writer.writerow([
-                        i,
-                        config_name,
-                        r,
-                        ts.current_iter,
-                        end_time - start_time,
-                        -best_sol.cost,
-                        ts.best_sol_time,
-                        ts.best_sol_iter,
-                    ])
-                
-                print(f"Cost: {-best_sol.cost}, Size: {len(best_sol)}, Iterations: {ts.current_iter}, Time: {end_time - start_time:.3f}s")
-            
+    for process in processes:
+        process.join()
+
+    print("Computational experiments finished.")
 
 if __name__ == "__main__":
     main()

@@ -6,7 +6,7 @@ from tabu.problems.sc_qbf.sc_qbf_inverse import SC_QBF_Inverse
 from tabu.solutions.solution import Solution
 
 class TS_SC_QBF(AbstractTS):
-    def __init__(self, tenure: int, iterations: int, timeout: int, filename: str, search_method: str, strategy: str, random_seed = 42, target_value = None):
+    def __init__(self, tenure: int, iterations: int, timeout: int, filename: str, search_method: str, strategy: str, random_seed = 42, target_value = None, verbose=True):
         self.fake = -1
         self.strategy = strategy
         self.search_method = search_method        
@@ -17,6 +17,7 @@ class TS_SC_QBF(AbstractTS):
         self.target_value = target_value
         super().__init__(obj_function, tenure, iterations)
 
+        self.verbose = verbose
         self.rng = random.Random(random_seed)
     
     def make_cl(self):
