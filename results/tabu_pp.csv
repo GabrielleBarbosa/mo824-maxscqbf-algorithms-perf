@@ -1,0 +1,2 @@
+instance,config,seed,total_iterations,total_time,best_cost,time_best_sol,iterations_best_sol
+scqbf_025_1,BEST_PROBABILISTIC,1,10000,6.0934975147247314,1316.0,0.007002115249633789,8

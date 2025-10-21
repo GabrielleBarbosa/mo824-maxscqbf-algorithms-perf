@@ -58,12 +58,13 @@ def main():
 
     parent_dir = "instances/sc_qbf"
     instances = [
-        ("scqbf_100_1", 400),
-        ("scqbf_200_1", 400),
-        ("scqbf_400_1", 400),
-        ("scqbf_100_1", 400),
-        ("scqbf_200_1", 400),
-        ("scqbf_400_1", 400),
+        ("scqbf_025_1", 400),
+        # ("scqbf_100_1", 400),
+        # ("scqbf_200_1", 400),
+        # ("scqbf_400_1", 400),
+        # ("scqbf_100_1", 400),
+        # ("scqbf_200_1", 400),
+        # ("scqbf_400_1", 400),
     ]
     
     configs = [

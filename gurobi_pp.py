@@ -16,10 +16,10 @@ def main():
     parent_dir = "instances/sc_qbf"
     instances = [
         "scqbf_025_1",
-        "scqbf_050_1",
-        "scqbf_100_1",
-        "scqbf_200_1",
-        "scqbf_400_1",
+        # "scqbf_050_1",
+        # "scqbf_100_1",
+        # "scqbf_200_1",
+        # "scqbf_400_1",
     ]
     
     for i in instances:
