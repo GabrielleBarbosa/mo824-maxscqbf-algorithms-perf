@@ -3,6 +3,7 @@ import csv
 import time
 import random
 from src_grasp.problems.qbf.solvers.GRASP_QBF import GRASP_QBF
+from src_grasp.problems.qbf.solvers.GRASP_QBF_SetCover import GRASP_QBF_SetCover
 
 instances = [
     "instances_grasp/qbf/qbf040",
@@ -45,7 +46,7 @@ for instance in instances:
         seed = random.randint(0, 999999)
         random.seed(seed)
 
-        grasp = GRASP_QBF(
+        grasp = GRASP_QBF_SetCover(
             alpha=alpha,
             iterations=iterations,
             filename=instance,
