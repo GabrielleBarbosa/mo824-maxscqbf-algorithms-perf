@@ -33,7 +33,8 @@ def worker(instance_name, target, config_name, enable_latin_hyper_cube, enable_m
             enableMutateOrCrossover=enable_mutate_or_crossover,
             enableUniformCrossover=enable_uniform_crossover,
             timeLimit=10*60*1000, # in milliseconds
-            targetValue=target
+            targetValue=target,
+            rng_seed=r,
         )
         
         best_sol, total_iterations, time_best_sol, iter_best_sol = ga.solve()

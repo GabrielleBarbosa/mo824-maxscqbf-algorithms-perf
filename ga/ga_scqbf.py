@@ -6,10 +6,6 @@ from .Max_SC_QBF import MAX_SC_QBF
 from .Solution import Solution
 
 
-random_seed = 0
-rng = random.Random(random_seed)
-
-
 class GA_SCQBF(AbstractGA):
     """
     Python implementation of GA_SCQBF (Genetic Algorithm for the Set Cover QBF problem).
@@ -18,7 +14,7 @@ class GA_SCQBF(AbstractGA):
 
     def __init__(self, popSize: int, mutationRate: float, filename: str,
                  enableLatinHyperCube: bool, enableMutateOrCrossover: bool,
-                 enableUniformCrossover: bool, timeLimit: int, targetValue: float = None):
+                 enableUniformCrossover: bool, timeLimit: int, rng_seed = 0, targetValue: float = None):
         super().__init__(MAX_SC_QBF(filename), 1, popSize, mutationRate)
         self.enableLatinHyperCube = enableLatinHyperCube
         self.enableMutateOrCrossover = enableMutateOrCrossover
@@ -32,6 +28,7 @@ class GA_SCQBF(AbstractGA):
         self.time_best_sol = None
         self.iter_best_sol = None
         self.total_iterations = 0
+        self.rng = random.Random(rng_seed)
 
     def createEmptySol(self):
         sol = Solution()
@@ -66,7 +63,7 @@ class GA_SCQBF(AbstractGA):
     def generateRandomChromosome(self):
         chromosome = AbstractGA.Chromosome()
         for _ in range(self.chromosomeSize):
-            chromosome.append(rng.randint(0, 1))
+            chromosome.append(self.rng.randint(0, 1))
         chromosome = self.fixChromosome(chromosome)
         return chromosome
 
@@ -108,8 +105,8 @@ class GA_SCQBF(AbstractGA):
         for i in range(0, self.popSize, 2):
             parent1 = parents[i]
             parent2 = parents[i + 1]
-            crosspoint1 = rng.randint(0, self.chromosomeSize)
-            crosspoint2 = rng.randint(0, self.chromosomeSize - crosspoint1) + crosspoint1
+            crosspoint1 = self.rng.randint(0, self.chromosomeSize)
+            crosspoint2 = self.rng.randint(0, self.chromosomeSize - crosspoint1) + crosspoint1
 
             offspring1 = AbstractGA.Chromosome()
             offspring2 = AbstractGA.Chromosome()
@@ -182,9 +179,9 @@ class GA_SCQBF(AbstractGA):
                 mutationProbability = 0.3
                 self.mutationRate = 0.05
 
-                if rng.random() < crossoverProbability:
+                if self.rng.random() < crossoverProbability:
                     offsprings = self.crossover(parents)
-                if rng.random() < mutationProbability:
+                if self.rng.random() < mutationProbability:
                     mutants = self.mutate(offsprings)
                 else:
                     mutants = offsprings
