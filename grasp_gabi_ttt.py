@@ -1,14 +1,11 @@
-import os
-import sys
 import time
 import csv
-import glob
 import multiprocessing
 
 from grasp_gabi.grasp_maxsc_qbf.algorithms.grasp_qbf_sc import GRASP_QBF_SC
 
-def main():    
-    output_file = "results/grasp_gabi_pp.csv"
+def worker(instance_name, target, process_index):
+    output_file = f"results/grasp_gabi_ttt_{process_index}.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -23,36 +20,17 @@ def main():
         ])
 
     parent_dir = "instances/sc_qbf"
-    instances = [
-        "scqbf_025_1",
-        "scqbf_025_2",
-        "scqbf_050_1",
-        "scqbf_050_2",
-        "scqbf_100_1",
-        "scqbf_100_2",
-        "scqbf_200_1",
-        "scqbf_200_2",
-        "scqbf_400_1",
-        "scqbf_400_2",
-    ]
-    
-    print("Running computational experiments...")
-    print("=" * 60)
-    
-    for i in instances:
-        print("\n" + "-" * 60)
-        print(f"Instance: {i}")
-        print("-" * 60)
-        print(f"\nRunning GRASP_RANDOM_GREEDY...")
+    for r in range(50):
         start_time = time.time()
-        
         solver = GRASP_QBF_SC(
-            filename=f"{parent_dir}/{i}.txt",
+            filename=f"{parent_dir}/{instance_name}.txt",
             iterations=None,
             alpha=0.1,
             construction_method="random_plus_greedy",
             local_search_method="first_improving",
-            time_limit=30*60
+            time_limit=10*60,
+            seed=r,
+            target=target
         )
         
         best_sol = solver.solve()
@@ -61,18 +39,40 @@ def main():
         with open(output_file, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([
-                i,
+                instance_name,
                 "GRASP_RANDOM_GREEDY",
-                1,
+                r,
                 solver.current_iter,
                 end_time - start_time,
                 best_sol.cost,
                 solver.best_sol_time,
                 solver.best_sol_iter,
             ])
-        
-        print(f"Cost: {best_sol.cost}, Size: {len(best_sol)}, Iterations: {solver.current_iter}, Time: {end_time - start_time:.3f}s")
-            
+
+def main():    
+    instances = [
+        ("scqbf_025_1", 400),
+        # ("scqbf_100_1", 400),
+        # ("scqbf_200_1", 400),
+        # ("scqbf_400_1", 400),
+    ]
+
+    processes = []
+    process_index = 0
+    for i, target in instances:
+        process = multiprocessing.Process(
+            target=worker,
+            args=(i, target, process_index)
+        )
+        processes.append(process)
+        process.start()
+        process_index += 1
+
+    for process in processes:
+        process.join()
+
+    print("Computational experiments finished.")
+    
 
 if __name__ == "__main__":
     main()
