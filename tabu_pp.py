@@ -20,10 +20,15 @@ def main():
     parent_dir = "instances/sc_qbf"
     instances = [
         "scqbf_025_1",
-        # "scqbf_050_1",
-        # "scqbf_100_1",
-        # "scqbf_200_1",
-        # "scqbf_400_1",
+        "scqbf_025_2",
+        "scqbf_050_1",
+        "scqbf_050_2",
+        "scqbf_100_1",
+        "scqbf_100_2",
+        "scqbf_200_1",
+        "scqbf_200_2",
+        "scqbf_400_1",
+        "scqbf_400_2",
     ]
     
     print("Running computational experiments...")
@@ -48,7 +53,6 @@ def main():
                 search_method=local_search,
                 timeout=30*60, 
                 random_seed=1, 
-                # target_value=-735.0,
             )
             
             best_sol = ts.solve()
