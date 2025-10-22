@@ -50,7 +50,8 @@ def main():
                 enableMutateOrCrossover=enable_mutate_or_crossover,
                 enableUniformCrossover=enable_uniform_crossover,
                 timeLimit=30*60*1000, # in milliseconds
-                targetValue=None
+                targetValue=None,
+                rng_seed=1,
             )
             
             best_sol, total_iterations, time_best_sol, iter_best_sol = ga.solve()
