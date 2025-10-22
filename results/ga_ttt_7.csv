@@ -1,0 +1,2 @@
+instance,config,seed,target,target_hit,total_iterations,total_time,best_cost,time_best_sol,iterations_best_sol
+scqbf_400_1,DEFAULT,0,134216.94999999998,False,53,608.5168135166168,88645.0,364.309,30
