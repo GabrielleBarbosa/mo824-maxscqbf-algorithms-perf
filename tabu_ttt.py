@@ -13,6 +13,7 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
             "config",
             "seed",
             "target",
+            "target_hit",
             "total_iterations",
             "total_time",
             "best_cost",
@@ -46,6 +47,7 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
                 config_name,
                 r,
                 target,
+                -best_sol.cost >= target,
                 ts.current_iter,
                 end_time - start_time,
                 -best_sol.cost,
@@ -59,10 +61,13 @@ def main():
 
     instances = [
         ("scqbf_100_1", 16665 * 0.99),
-        ("scqbf_200_1", 48906 * 0.99),
-        ("scqbf_400_1", 321752 * 0.90),
-        ("scqbf_400_1", 321752 * 0.95),
-        ("scqbf_400_1", 321752 * 0.99),
+        ("scqbf_200_1", 48906 * 0.90),
+        ("scqbf_200_1", 48906 * 0.95),
+        ("scqbf_400_1", 141281 * 0.60),
+        ("scqbf_400_1", 141281 * 0.70),
+        ("scqbf_400_1", 141281 * 0.80),
+        ("scqbf_400_1", 141281 * 0.90),
+        ("scqbf_400_1", 141281 * 0.95),
     ]
     
     configs = [
