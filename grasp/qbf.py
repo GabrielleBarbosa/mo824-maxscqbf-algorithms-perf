@@ -20,6 +20,5 @@ def read_sc_max_qbf(path: str) -> Tuple[int, List[Set[int]], np.ndarray]:
             for j in range(i, size):
                 A[i, j] = float(content[content_index])
                 content_index += 1
-                if i != j:
-                    A[j, i] = 0
+                A[j, i] = A[i, j]
     return size, A, sets
