@@ -1,9 +1,10 @@
+
 import time
 import csv
-from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
+from ga.ga_scqbf import GA_SCQBF
 
 def main():    
-    output_file = "results/tabu_pp.csv"
+    output_file = "results/ga_pp.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -31,31 +32,34 @@ def main():
         "scqbf_400_2",
     ]
     
-    print("Running computational experiments...")
+    print("Running GA computational experiments...")
     print("=" * 60)
     
     configs = [
-        ("BEST_PROBABILISTIC", 0.2, "best_improving", "probabilistic"),
+        ("DEFAULT", False, True, True, 100, 0.05),
     ]
     
     for i in instances:
         print("\n" + "-" * 60)
         print(f"Instance: {i}")
         print("-" * 60)
-        for config_name, tenure, local_search, strategy in configs:
+        for config_name, enable_latin_hyper_cube, enable_mutate_or_crossover, enable_uniform_crossover, population_size, mutation_rate in configs:
             print(f"\nRunning {config_name}...")
             start_time = time.time()
             
-            ts = TS_SC_QBF(
-                tenure=tenure, 
+            ga = GA_SCQBF(
+                popSize=population_size,
+                mutationRate=mutation_rate,
                 filename=f"{parent_dir}/{i}.txt",
-                strategy=strategy,
-                search_method=local_search,
-                timeout=30*60, 
-                random_seed=1, 
+                enableLatinHyperCube=enable_latin_hyper_cube,
+                enableMutateOrCrossover=enable_mutate_or_crossover,
+                enableUniformCrossover=enable_uniform_crossover,
+                timeLimit=30*60*1000, # in milliseconds
+                targetValue=None,
+                rng_seed=1,
             )
             
-            best_sol = ts.solve()
+            best_sol, total_iterations, time_best_sol, iter_best_sol = ga.solve()
             end_time = time.time()
 
             with open(output_file, "a", newline="") as f:
@@ -63,15 +67,15 @@ def main():
                 writer.writerow([
                     i,
                     config_name,
-                    1,
-                    ts.current_iter,
+                    0, # seed is not directly configurable in the same way
+                    total_iterations,
                     end_time - start_time,
-                    -best_sol.cost,
-                    ts.best_sol_time,
-                    ts.best_sol_iter,
+                    best_sol.cost,
+                    time_best_sol,
+                    iter_best_sol,
                 ])
             
-            print(f"Cost: {-best_sol.cost}, Size: {len(best_sol)}, Iterations: {ts.current_iter}, Time: {end_time - start_time:.3f}s")
+            print(f"Cost: {best_sol.cost}, Size: {len(best_sol)}, Iterations: {total_iterations}, Time: {end_time - start_time:.3f}s")
             
 
 if __name__ == "__main__":

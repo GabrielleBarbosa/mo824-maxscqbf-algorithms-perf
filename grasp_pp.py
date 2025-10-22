@@ -1,9 +1,15 @@
+
 import time
 import csv
-from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
+import numpy as np
+from typing import List, Set
+
+from grasp.grasp_scmax import GRASP_SC_MAX_QBF, GRASPConfig
+from grasp.sc_model import SCMaxQBF
+from grasp.qbf import read_sc_max_qbf
 
 def main():    
-    output_file = "results/tabu_pp.csv"
+    output_file = "results/grasp_pp.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -31,31 +37,35 @@ def main():
         "scqbf_400_2",
     ]
     
-    print("Running computational experiments...")
+    print("Running GRASP computational experiments...")
     print("=" * 60)
     
     configs = [
-        ("BEST_PROBABILISTIC", 0.2, "best_improving", "probabilistic"),
+        ("DEFAULT", 0.3, "best", 0.4),
     ]
     
     for i in instances:
         print("\n" + "-" * 60)
         print(f"Instance: {i}")
         print("-" * 60)
-        for config_name, tenure, local_search, strategy in configs:
+        for config_name, alpha, ls_mode, lambda_balance in configs:
             print(f"\nRunning {config_name}...")
             start_time = time.time()
             
-            ts = TS_SC_QBF(
-                tenure=tenure, 
-                filename=f"{parent_dir}/{i}.txt",
-                strategy=strategy,
-                search_method=local_search,
-                timeout=30*60, 
-                random_seed=1, 
+            _, Q, sets = read_sc_max_qbf(f"{parent_dir}/{i}.txt")
+            model = SCMaxQBF(Q, sets)
+            
+            cfg = GRASPConfig(
+                alpha=alpha,
+                ls_mode=ls_mode,
+                lambda_balance=lambda_balance,
+                time_limit=30*60,
+                seed=1
             )
             
-            best_sol = ts.solve()
+            grasp = GRASP_SC_MAX_QBF(model, cfg)
+            
+            best_S, best_val, ttt, total_time, total_iterations, time_best_sol, iter_best_sol = grasp.run()
             end_time = time.time()
 
             with open(output_file, "a", newline="") as f:
@@ -64,14 +74,14 @@ def main():
                     i,
                     config_name,
                     1,
-                    ts.current_iter,
+                    total_iterations,
                     end_time - start_time,
-                    -best_sol.cost,
-                    ts.best_sol_time,
-                    ts.best_sol_iter,
+                    best_val,
+                    time_best_sol,
+                    iter_best_sol,
                 ])
             
-            print(f"Cost: {-best_sol.cost}, Size: {len(best_sol)}, Iterations: {ts.current_iter}, Time: {end_time - start_time:.3f}s")
+            print(f"Cost: {best_val}, Size: {len(best_S)}, Iterations: {total_iterations}, Time: {end_time - start_time:.3f}s")
             
 
 if __name__ == "__main__":

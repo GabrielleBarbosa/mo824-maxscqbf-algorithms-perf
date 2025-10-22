@@ -1,11 +1,18 @@
+
 import time
 import csv
 import multiprocessing
 import os
-from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
+import numpy as np
+from typing import List, Set
 
-def worker(instance_name, target, config_name, tenure, local_search, strategy, process_index):
-    output_file = f"results/tabu_ttt_{process_index}.csv"
+from grasp.grasp_scmax import GRASP_SC_MAX_QBF, GRASPConfig
+from grasp.sc_model import SCMaxQBF
+from grasp.qbf import read_sc_max_qbf
+
+
+def worker(instance_name, target, config_name, alpha, ls_mode, lambda_balance, process_index):
+    output_file = f"results/grasp_ttt_{process_index}.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -24,18 +31,21 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
     for r in range(50):
         start_time = time.time()
         
-        ts = TS_SC_QBF(
-            tenure=tenure, 
-            filename=f"{parent_dir}/{instance_name}.txt",
-            strategy=strategy,
-            search_method=local_search,
-            timeout=10*60, 
-            random_seed=r, 
-            target_value=-target,
-            verbose=False
+        _, Q, sets = read_sc_max_qbf(f"{parent_dir}/{instance_name}.txt")
+        model = SCMaxQBF(Q, sets)
+        
+        cfg = GRASPConfig(
+            alpha=alpha,
+            ls_mode=ls_mode,
+            lambda_balance=lambda_balance,
+            time_limit=10*60,
+            seed=r,
+            target_value=target
         )
         
-        best_sol = ts.solve()
+        grasp = GRASP_SC_MAX_QBF(model, cfg)
+        
+        best_S, best_val, ttt, total_time, total_iterations, time_best_sol, iter_best_sol = grasp.run()
         end_time = time.time()
 
         with open(output_file, "a", newline="") as f:
@@ -44,39 +54,35 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
                 instance_name,
                 config_name,
                 r,
-                ts.current_iter,
+                total_iterations,
                 end_time - start_time,
-                -best_sol.cost,
-                ts.best_sol_time,
-                ts.best_sol_iter,
+                best_val,
+                time_best_sol,
+                iter_best_sol,
             ])
 
 def main():
     if not os.path.exists("results"):
         os.makedirs("results")
 
-    parent_dir = "instances/sc_qbf"
     instances = [
         ("scqbf_025_1", 400),
-        # ("scqbf_100_1", 400),
-        # ("scqbf_200_1", 400),
-        # ("scqbf_400_1", 400),
         # ("scqbf_100_1", 400),
         # ("scqbf_200_1", 400),
         # ("scqbf_400_1", 400),
     ]
     
     configs = [
-        ("BEST_PROBABILISTIC", 0.2, "best_improving", "probabilistic"),
+        ("DEFAULT", 0.3, "best", 0.4),
     ]
     
     processes = []
     process_index = 0
     for i, target in instances:
-        for config_name, tenure, local_search, strategy in configs:
+        for config_name, alpha, ls_mode, lambda_balance in configs:
             process = multiprocessing.Process(
                 target=worker,
-                args=(i, target, config_name, tenure, local_search, strategy, process_index)
+                args=(i, target, config_name, alpha, ls_mode, lambda_balance, process_index)
             )
             processes.append(process)
             process.start()

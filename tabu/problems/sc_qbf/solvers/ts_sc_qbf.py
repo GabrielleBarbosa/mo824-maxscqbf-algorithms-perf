@@ -6,7 +6,7 @@ from tabu.problems.sc_qbf.sc_qbf_inverse import SC_QBF_Inverse
 from tabu.solutions.solution import Solution
 
 class TS_SC_QBF(AbstractTS):
-    def __init__(self, tenure: int, iterations: int, timeout: int, filename: str, search_method: str, strategy: str, random_seed = 42, target_value = None, verbose=True):
+    def __init__(self, tenure: int, timeout: int, filename: str, search_method: str, strategy: str, random_seed = 42, target_value = None, verbose=True):
         self.fake = -1
         self.strategy = strategy
         self.search_method = search_method        
@@ -15,7 +15,7 @@ class TS_SC_QBF(AbstractTS):
             tenure = int(tenure * obj_function.get_domain_size())
         self.timeout = timeout
         self.target_value = target_value
-        super().__init__(obj_function, tenure, iterations)
+        super().__init__(obj_function, tenure)
 
         self.verbose = verbose
         self.rng = random.Random(random_seed)
@@ -134,7 +134,8 @@ class TS_SC_QBF(AbstractTS):
         start_time = time.time()
         time_limit = start_time + self.timeout 
 
-        for i in range(self.iterations):
+        i = 0
+        while True:
             self.current_iter = i + 1
             if time.time() >= time_limit:
                 if self.verbose:
@@ -152,5 +153,7 @@ class TS_SC_QBF(AbstractTS):
                     if self.target_value != None and self.best_sol.cost <= self.target_value:
                         print(f"(Iter. {i}) Target value reached, stopping method")
                         break
+
+            i += 1
 
         return self.best_sol
