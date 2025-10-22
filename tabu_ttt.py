@@ -12,6 +12,7 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
             "instance",
             "config",
             "seed",
+            "target",
             "total_iterations",
             "total_time",
             "best_cost",
@@ -44,6 +45,7 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
                 instance_name,
                 config_name,
                 r,
+                target,
                 ts.current_iter,
                 end_time - start_time,
                 -best_sol.cost,
@@ -55,15 +57,12 @@ def main():
     if not os.path.exists("results"):
         os.makedirs("results")
 
-    parent_dir = "instances/sc_qbf"
     instances = [
-        ("scqbf_025_1", 400),
-        # ("scqbf_100_1", 400),
-        # ("scqbf_200_1", 400),
-        # ("scqbf_400_1", 400),
-        # ("scqbf_100_1", 400),
-        # ("scqbf_200_1", 400),
-        # ("scqbf_400_1", 400),
+        ("scqbf_100_1", 16665 * 0.99),
+        ("scqbf_200_1", 48906 * 0.99),
+        ("scqbf_400_1", 321752 * 0.90),
+        ("scqbf_400_1", 321752 * 0.95),
+        ("scqbf_400_1", 321752 * 0.99),
     ]
     
     configs = [

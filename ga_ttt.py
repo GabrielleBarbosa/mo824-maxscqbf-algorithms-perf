@@ -13,6 +13,7 @@ def worker(instance_name, target, config_name, enable_latin_hyper_cube, enable_m
             "instance",
             "config",
             "seed",
+            "target",
             "total_iterations",
             "total_time",
             "best_cost",
@@ -46,6 +47,7 @@ def worker(instance_name, target, config_name, enable_latin_hyper_cube, enable_m
                 instance_name,
                 config_name,
                 r,
+                target,
                 total_iterations,
                 end_time - start_time,
                 best_sol.cost,
@@ -58,10 +60,11 @@ def main():
         os.makedirs("results")
 
     instances = [
-        ("scqbf_025_1", 400),
-        # ("scqbf_100_1", 400),
-        # ("scqbf_200_1", 400),
-        # ("scqbf_400_1", 400),
+        ("scqbf_100_1", 16665 * 0.99),
+        ("scqbf_200_1", 48906 * 0.99),
+        ("scqbf_400_1", 321752 * 0.90),
+        ("scqbf_400_1", 321752 * 0.95),
+        ("scqbf_400_1", 321752 * 0.99),
     ]
     
     configs = [

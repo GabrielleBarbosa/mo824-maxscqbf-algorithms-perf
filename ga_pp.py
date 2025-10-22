@@ -26,10 +26,15 @@ def main():
         "scqbf_050_2",
         "scqbf_100_1",
         "scqbf_100_2",
+        "scqbf_100_3",
+        "scqbf_100_4",
         "scqbf_200_1",
         "scqbf_200_2",
+        "scqbf_200_3",
+        "scqbf_200_4",
         "scqbf_400_1",
         "scqbf_400_2",
+        "scqbf_400_3",
     ]
     
     print("Running GA computational experiments...")
