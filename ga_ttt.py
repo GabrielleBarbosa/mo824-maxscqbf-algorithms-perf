@@ -1,11 +1,12 @@
+
 import time
 import csv
 import multiprocessing
 import os
-from tabu.problems.sc_qbf.solvers.ts_sc_qbf import TS_SC_QBF
+from ga.ga_scqbf import GA_SCQBF
 
-def worker(instance_name, target, config_name, tenure, local_search, strategy, process_index):
-    output_file = f"results/tabu_ttt_{process_index}.csv"
+def worker(instance_name, target, config_name, enable_latin_hyper_cube, enable_mutate_or_crossover, enable_uniform_crossover, population_size, mutation_rate, process_index):
+    output_file = f"results/ga_ttt_{process_index}.csv"
     with open(output_file, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([
@@ -24,18 +25,18 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
     for r in range(50):
         start_time = time.time()
         
-        ts = TS_SC_QBF(
-            tenure=tenure, 
+        ga = GA_SCQBF(
+            popSize=population_size,
+            mutationRate=mutation_rate,
             filename=f"{parent_dir}/{instance_name}.txt",
-            strategy=strategy,
-            search_method=local_search,
-            timeout=10*60, 
-            random_seed=r, 
-            target_value=-target,
-            verbose=False
+            enableLatinHyperCube=enable_latin_hyper_cube,
+            enableMutateOrCrossover=enable_mutate_or_crossover,
+            enableUniformCrossover=enable_uniform_crossover,
+            timeLimit=10*60*1000, # in milliseconds
+            targetValue=target
         )
         
-        best_sol = ts.solve()
+        best_sol, total_iterations, time_best_sol, iter_best_sol = ga.solve()
         end_time = time.time()
 
         with open(output_file, "a", newline="") as f:
@@ -44,39 +45,35 @@ def worker(instance_name, target, config_name, tenure, local_search, strategy, p
                 instance_name,
                 config_name,
                 r,
-                ts.current_iter,
+                total_iterations,
                 end_time - start_time,
-                -best_sol.cost,
-                ts.best_sol_time,
-                ts.best_sol_iter,
+                best_sol.cost,
+                time_best_sol,
+                iter_best_sol,
             ])
 
 def main():
     if not os.path.exists("results"):
         os.makedirs("results")
 
-    parent_dir = "instances/sc_qbf"
     instances = [
         ("scqbf_025_1", 400),
-        # ("scqbf_100_1", 400),
-        # ("scqbf_200_1", 400),
-        # ("scqbf_400_1", 400),
         # ("scqbf_100_1", 400),
         # ("scqbf_200_1", 400),
         # ("scqbf_400_1", 400),
     ]
     
     configs = [
-        ("BEST_PROBABILISTIC", 0.2, "best_improving", "probabilistic"),
+        ("DEFAULT", False, True, True, 100, 0.05),
     ]
     
     processes = []
     process_index = 0
     for i, target in instances:
-        for config_name, tenure, local_search, strategy in configs:
+        for config_name, enable_latin_hyper_cube, enable_mutate_or_crossover, enable_uniform_crossover, population_size, mutation_rate in configs:
             process = multiprocessing.Process(
                 target=worker,
-                args=(i, target, config_name, tenure, local_search, strategy, process_index)
+                args=(i, target, config_name, enable_latin_hyper_cube, enable_mutate_or_crossover, enable_uniform_crossover, population_size, mutation_rate, process_index)
             )
             processes.append(process)
             process.start()
