@@ -2,7 +2,7 @@ import time
 import csv
 import multiprocessing
 
-from grasp_gabi.grasp_maxsc_qbf.algorithms.grasp_qbf_sc import GRASP_QBF_SC
+from grasp.grasp_maxsc_qbf.algorithms.grasp_qbf_sc import GRASP_QBF_SC
 
 def worker(instance_name, target, process_index):
     output_file = f"results/grasp_gabi_ttt_{process_index}.csv"

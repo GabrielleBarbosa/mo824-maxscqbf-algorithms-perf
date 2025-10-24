@@ -1,11 +1,7 @@
-import os
-import sys
 import time
 import csv
-import glob
-import multiprocessing
 
-from grasp_gabi.grasp_maxsc_qbf.algorithms.grasp_qbf_sc import GRASP_QBF_SC
+from grasp.grasp_maxsc_qbf.algorithms.grasp_qbf_sc import GRASP_QBF_SC
 
 def main():    
     output_file = "results/grasp_gabi_pp.csv"
